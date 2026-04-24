@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>泡泡控制台</title>
+    <title>泡泡的投喂机</title>
     <style>
         :root {
-            --primary-color: #007aff;
-            --success-color: #34c759;
-            --danger-color: #ff3b30;
-            --bg-color: #f2f2f7;
+            --accent-color: #5856d6;
+            --bg-color: #f5f5f7;
+            --text-color: #1d1d1f;
+            --disabled-color: #aeaeb2;
+            --warning-color: #ff9500;
         }
 
         body {
@@ -17,95 +18,82 @@
             background-color: var(--bg-color);
             margin: 0;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 40px;
-        }
-
-        .card {
-            background: white;
-            padding: 24px;
-            border-radius: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            width: 85%;
-            max-width: 350px;
-            text-align: center;
-        }
-
-        h2 { margin: 0 0 10px 0; font-size: 1.4rem; color: #1c1c1e; }
-
-        /* 状态显示 */
-        .status-bar {
-            display: flex;
             justify-content: center;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 30px;
-            font-size: 0.85rem;
-            color: #8e8e93;
-        }
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #c7c7cc;
-        }
-        .online { background: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
-        .offline { background: var(--danger-color); }
-
-        /* 垂直按钮组 */
-        .button-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 15px; /* 按钮之间的间距 */
+            padding-top: 30px;
         }
 
-        button {
-            border: none;
+        .app-container { width: 90%; max-width: 380px; }
+
+        .status-card {
             background: white;
-            color: var(--primary-color);
-            padding: 18px;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid rgba(0, 122, 255, 0.2);
-            transition: all 0.1s;
-            -webkit-tap-highlight-color: transparent;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        /* 激活（按下）效果 */
-        button:active {
-            background: var(--primary-color);
-            color: white;
-            transform: scale(0.97);
+        .status-info h2 { margin: 0; font-size: 1.1rem; color: var(--text-color); }
+
+        .dot-indicator { font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; background: #d1d1d6; }
+        .online { color: #34c759; }
+        .online .dot { background: #34c759; box-shadow: 0 0 8px #34c759; }
+        .offline { color: #ff3b30; }
+        .offline .dot { background: #ff3b30; }
+
+        .btn-stack { display: grid; gap: 12px; }
+        .btn {
+            background: white; border: none; padding: 20px; border-radius: 16px;
+            font-size: 1.05rem; font-weight: 600; color: var(--text-color);
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            cursor: pointer; -webkit-tap-highlight-color: transparent;
+            transition: all 0.2s;
         }
 
-        /* 日志提示区 */
-        #log {
-            height: 20px;
-            font-size: 0.85rem;
-            margin-top: 25px;
-            font-weight: 500;
+        .btn:active:not(:disabled) { background-color: #f2f2f7; transform: scale(0.97); }
+
+        .btn:disabled {
+            background-color: #e5e5ea;
+            color: var(--disabled-color);
+            cursor: not-allowed;
+            box-shadow: none;
         }
+
+        #log { 
+            text-align: center; 
+            margin-top: 30px; 
+            font-size: 0.9rem; 
+            min-height: 1.2rem; 
+            font-weight: 500; 
+        }
+
+        .lock-text { color: var(--warning-color); font-weight: bold; }
+        .success-text { color: var(--accent-color); }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>泡泡控制台</h2>
-    
-    <div class="status-bar">
-        <div id="dot" class="dot"></div>
-        <span id="status-text">检测状态中...</span>
+<div class="app-container">
+    <div class="status-card">
+        <div class="status-info">
+            <h2>泡泡的投喂机</h2>
+        </div>
+        <div id="status-wrap" class="dot-indicator">
+            <span class="dot"></span>
+            <span id="status-text">检测中...</span>
+        </div>
     </div>
 
-    <div class="button-stack">
-        <button onclick="sendFeed(1)">触发 1 次</button>
-        <button onclick="sendFeed(2)">触发 2 次</button>
-        <button onclick="sendFeed(3)">触发 3 次</button>
-        <button onclick="sendFeed(4)">触发 4 次</button>
-        <button onclick="sendFeed(5)">触发 5 次</button>
+    <div class="btn-stack">
+        <button class="btn" onclick="sendFeed(1)">投喂 1 份 <span>🍚</span></button>
+        <button class="btn" onclick="sendFeed(2)">投喂 2 份 <span>🍖</span></button>
+        <button class="btn" onclick="sendFeed(3)">投喂 3 份 <span>🍱</span></button>
+        <button class="btn" onclick="sendFeed(4)">投喂 4 份 <span>🍗</span></button>
+        <button class="btn" onclick="sendFeed(5)">投喂 5 份 <span>🥘</span></button>
     </div>
 
     <div id="log"></div>
@@ -116,53 +104,71 @@
     const topic = "dog006";
 
     function sendFeed(count) {
-        const msg = "start" + count; 
         const logDiv = document.getElementById('log');
-
-        logDiv.style.color = "var(--primary-color)"; 
-        logDiv.innerText = "发送指令: " + count + " 份";
-
+        logDiv.className = "success-text";
+        logDiv.innerText = "指令已发送...";
+        
         fetch("https://apis.bemfa.com/va/postJsonMsg", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                uid: uid, 
-                topic: topic, 
-                type: 1, 
-                msg: msg 
-            })
+            body: JSON.stringify({ uid: uid, topic: topic, type: 1, msg: "start" + count })
         })
         .then(res => res.json())
-        .then(data => {
-            logDiv.innerText = "✅ 指令已送达";
-            setTimeout(() => { logDiv.innerText = ""; }, 2500);
+        .then(() => {
+            // 根据你的反馈：1份 = 5秒
+            const totalLockTime = count * 5; 
+            startLock(totalLockTime, count);
         })
-        .catch(err => {
-            logDiv.innerText = "❌ 网络连接失败";
-            logDiv.style.color = "var(--danger-color)"; // 这里也要加引号
+        .catch(() => { 
+            logDiv.innerText = "发送失败，请重试"; 
         });
     }
-    async function checkOnline() {
+
+    function startLock(seconds, count) {
+        const buttons = document.querySelectorAll('.btn');
+        const logDiv = document.getElementById('log');
+        let remaining = seconds;
+
+        buttons.forEach(b => b.disabled = true);
+        logDiv.className = "lock-text";
+
+        const timer = setInterval(() => {
+            logDiv.innerText = `正在投喂 (${count}份)... 剩余 ${remaining} 秒`;
+            remaining--;
+
+            if (remaining < 0) {
+                clearInterval(timer);
+                buttons.forEach(b => b.disabled = false);
+                logDiv.className = "success-text";
+                logDiv.innerText = "投喂任务已完成";
+                setTimeout(() => { if(logDiv.className === "success-text") logDiv.innerText = ""; }, 3000);
+            }
+        }, 1000);
+    }
+
+    async function checkStatus() {
         try {
             const res = await fetch(`https://apis.bemfa.com/va/online?uid=${uid}&topic=${topic}&type=1`);
-            const data = await res.json();
-            const dot = document.getElementById('dot');
+            const json = await res.json();
+            const wrap = document.getElementById('status-wrap');
             const text = document.getElementById('status-text');
 
-            if (data.data === true) {
-                dot.className = "dot online";
-                text.innerText = "设备在线";
-            } else {
-                dot.className = "dot offline";
-                text.innerText = "设备离线";
+            if (json.code === 0) {
+                if (json.data === true) {
+                    wrap.className = "dot-indicator online";
+                    text.innerText = "在线";
+                } else {
+                    wrap.className = "dot-indicator offline";
+                    text.innerText = "离线";
+                }
             }
         } catch (e) {
-            document.getElementById('status-text').innerText = "状态获取失败";
+            document.getElementById('status-text').innerText = "网络异常";
         }
     }
 
-    setInterval(checkOnline, 5000);
-    checkOnline();
+    setInterval(checkStatus, 10000);
+    checkStatus();
 </script>
 
 </body>
