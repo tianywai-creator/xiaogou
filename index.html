@@ -103,7 +103,7 @@
     const uid = "1944c79a18f345f487dde0852bd49c3b";
     const topic = "dog006";
 
-    function sendFeed(count) {
+function sendFeed(count) {
         const logDiv = document.getElementById('log');
         logDiv.className = "success-text";
         logDiv.innerText = "指令已发送...";
@@ -115,8 +115,13 @@
         })
         .then(res => res.json())
         .then(() => {
-            // 根据你的反馈：1份 = 5秒
-            const totalLockTime = count * 5; 
+            // 修改逻辑：
+            // 每次喂食前有 1.2s 解锁 + 0.5s 等待 ≈ 2秒冗余
+            // 加上每份 9 秒的执行时间
+            const unlockTime = 2; 
+            const feedTimePerUnit = 9;
+            const totalLockTime = unlockTime + (count * feedTimePerUnit); 
+            
             startLock(totalLockTime, count);
         })
         .catch(() => { 
@@ -133,7 +138,13 @@
         logDiv.className = "lock-text";
 
         const timer = setInterval(() => {
-            logDiv.innerText = `正在投喂 (${count}份)... 剩余 ${remaining} 秒`;
+            // 如果还在解锁阶段（前2秒）
+            if (remaining > (count * 9)) {
+                logDiv.innerText = `正在解锁并准备投喂... 剩余 ${remaining} 秒`;
+            } else {
+                logDiv.innerText = `正在投喂 (${count}份)... 剩余 ${remaining} 秒`;
+            }
+            
             remaining--;
 
             if (remaining < 0) {
