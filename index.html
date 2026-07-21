@@ -11,7 +11,11 @@
             --text-color: #1d1d1f;
             --disabled-color: #aeaeb2;
             --warning-color: #ff9500;
+            --danger-color: #ff3b30;
+            --success-color: #34c759;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: -apple-system, sans-serif;
@@ -20,9 +24,10 @@
             display: flex;
             justify-content: center;
             padding-top: 30px;
+            padding-bottom: 30px;
         }
 
-        .app-container { width: 90%; max-width: 380px; }
+        .app-container { width: 90%; max-width: 400px; }
 
         .status-card {
             background: white;
@@ -39,23 +44,24 @@
 
         .dot-indicator { font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; }
         .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; background: #d1d1d6; }
-        .online { color: #34c759; }
-        .online .dot { background: #34c759; box-shadow: 0 0 8px #34c759; }
-        .offline { color: #ff3b30; }
-        .offline .dot { background: #ff3b30; }
+        .online { color: var(--success-color); }
+        .online .dot { background: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
+        .offline { color: var(--danger-color); }
+        .offline .dot { background: var(--danger-color); }
 
-        .btn-stack { display: grid; gap: 12px; }
+        .btn-stack { display: grid; gap: 10px; }
+        
         .btn {
-            background: white; border: none; padding: 20px; border-radius: 16px;
-            font-size: 1.05rem; font-weight: 600; color: var(--text-color);
+            background: white; border: none; padding: 18px 20px; border-radius: 16px;
+            font-size: 1rem; font-weight: 600; color: var(--text-color);
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             cursor: pointer; -webkit-tap-highlight-color: transparent;
             transition: all 0.2s;
+            width: 100%;
         }
 
         .btn:active:not(:disabled) { background-color: #f2f2f7; transform: scale(0.97); }
-
         .btn:disabled {
             background-color: #e5e5ea;
             color: var(--disabled-color);
@@ -63,24 +69,49 @@
             box-shadow: none;
         }
 
-        #log { 
-            text-align: center; 
-            margin-top: 30px; 
-            font-size: 0.9rem; 
-            min-height: 1.2rem; 
-            font-weight: 500; 
+        .btn-danger {
+            background-color: #ffe6e6;
+            color: var(--danger-color);
+            border: 2px solid var(--danger-color);
+            margin-top: 5px;
+        }
+        .btn-danger:active:not(:disabled) { background-color: #ffcccc; }
+        .btn-danger:disabled { 
+            background-color: #e5e5ea; 
+            color: var(--disabled-color);
+            border-color: var(--disabled-color);
         }
 
-        .lock-text { color: var(--warning-color); font-weight: bold; }
-        .success-text { color: var(--accent-color); }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-row .btn { justify-content: center; }
+
+        #log { 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 0.95rem; 
+            min-height: 1.5rem; 
+            font-weight: 500; 
+            padding: 10px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+
+        .lock-text { color: var(--warning-color); }
+        .success-text { color: var(--success-color); }
+        .error-text { color: var(--danger-color); }
+        .idle-text { color: var(--disabled-color); }
+
+        .stop-btn-container { margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
+    <!-- 状态卡片 -->
     <div class="status-card">
         <div class="status-info">
-            <h2>泡泡的投喂机</h2>
+            <h2>🐶 泡泡的投喂机</h2>
         </div>
         <div id="status-wrap" class="dot-indicator">
             <span class="dot"></span>
@@ -88,75 +119,183 @@
         </div>
     </div>
 
+    <!-- 投喂按钮区 -->
     <div class="btn-stack">
-        <button class="btn" onclick="sendFeed(1)">投喂 1 份 <span>🍚</span></button>
-        <button class="btn" onclick="sendFeed(2)">投喂 2 份 <span>🍖</span></button>
-        <button class="btn" onclick="sendFeed(3)">投喂 3 份 <span>🍱</span></button>
-        <button class="btn" onclick="sendFeed(4)">投喂 4 份 <span>🍗</span></button>
-        <button class="btn" onclick="sendFeed(5)">投喂 5 份 <span>🥘</span></button>
+        <!-- 第一行：1-5份 -->
+        <div class="btn-row">
+            <button class="btn" onclick="sendFeed(1)">1 份 🍚</button>
+            <button class="btn" onclick="sendFeed(2)">2 份 🍖</button>
+        </div>
+        <div class="btn-row">
+            <button class="btn" onclick="sendFeed(3)">3 份 🍱</button>
+            <button class="btn" onclick="sendFeed(4)">4 份 🍗</button>
+        </div>
+        <div class="btn-row">
+            <button class="btn" onclick="sendFeed(5)">5 份 🥘</button>
+            <button class="btn" onclick="sendFeed(10)">10 份 🎉</button>
+        </div>
     </div>
 
-    <div id="log"></div>
+    <!-- 紧急停止按钮 -->
+    <div class="stop-btn-container">
+        <button class="btn btn-danger" onclick="sendStop()" id="stopBtn">⏹ 紧急停止</button>
+    </div>
+
+    <!-- 日志显示区 -->
+    <div id="log">👋 准备就绪</div>
 </div>
 
 <script>
+    // ========== 配置 ==========
     const uid = "1944c79a18f345f487dde0852bd49c3b";
     const topic = "dog006";
+    const feedTimePerUnit = 9; // 每份预估秒数
 
-function sendFeed(count) {
+    // ========== 状态变量 ==========
+    let isRunning = false;
+    let lockTimer = null;
+    let remainingSeconds = 0;
+
+    // ========== 发送投喂指令 ==========
+    function sendFeed(count) {
         const logDiv = document.getElementById('log');
-        logDiv.className = "success-text";
-        logDiv.innerText = "指令已发送...";
         
+        // 如果设备正在运行，拒绝新指令
+        if (isRunning) {
+            logDiv.className = "lock-text";
+            logDiv.innerText = "⏳ 设备正在运行，请等待完成或点击「紧急停止」";
+            return;
+        }
+
+        // 锁定按钮
+        setButtonsDisabled(true);
+        isRunning = true;
+        logDiv.className = "success-text";
+        logDiv.innerText = `📤 发送投喂 ${count} 份指令...`;
+
+        // 发送指令
         fetch("https://apis.bemfa.com/va/postJsonMsg", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ uid: uid, topic: topic, type: 1, msg: "start" + count })
+            body: JSON.stringify({ uid: uid, topic: topic, type: 1, msg: "" + count })
         })
         .then(res => res.json())
-        .then(() => {
-            // 修改逻辑：
-            // 每次喂食前有 1.2s 解锁 + 0.5s 等待 ≈ 2秒冗余
-            // 加上每份 9 秒的执行时间
-            const unlockTime = 2; 
-            const feedTimePerUnit = 9;
-            const totalLockTime = unlockTime + (count * feedTimePerUnit); 
-            
-            startLock(totalLockTime, count);
+        .then(data => {
+            if (data.code === 0) {
+                logDiv.className = "success-text";
+                logDiv.innerText = `✅ 指令已送达，设备开始投喂 ${count} 份`;
+                // 启动预估计时器
+                startLockTimer(count);
+            } else {
+                throw new Error(data.message || '服务器返回错误');
+            }
         })
-        .catch(() => { 
-            logDiv.innerText = "发送失败，请重试"; 
+        .catch((err) => {
+            logDiv.className = "error-text";
+            logDiv.innerText = `❌ 发送失败：${err.message || '请检查网络'}`;
+            setButtonsDisabled(false);
+            isRunning = false;
         });
     }
 
-    function startLock(seconds, count) {
-        const buttons = document.querySelectorAll('.btn');
+    // ========== 发送紧急停止指令 ==========
+    function sendStop() {
         const logDiv = document.getElementById('log');
-        let remaining = seconds;
+        
+        if (!isRunning) {
+            logDiv.className = "idle-text";
+            logDiv.innerText = "⏸ 设备当前空闲，无需停止";
+            return;
+        }
 
-        buttons.forEach(b => b.disabled = true);
         logDiv.className = "lock-text";
+        logDiv.innerText = "⏹ 发送紧急停止指令...";
 
-        const timer = setInterval(() => {
-            // 如果还在解锁阶段（前2秒）
-            if (remaining > (count * 9)) {
-                logDiv.innerText = `正在解锁并准备投喂... 剩余 ${remaining} 秒`;
-            } else {
-                logDiv.innerText = `正在投喂 (${count}份)... 剩余 ${remaining} 秒`;
-            }
-            
-            remaining--;
-
-            if (remaining < 0) {
-                clearInterval(timer);
-                buttons.forEach(b => b.disabled = false);
+        fetch("https://apis.bemfa.com/va/postJsonMsg", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ uid: uid, topic: topic, type: 1, msg: "stop" })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.code === 0) {
                 logDiv.className = "success-text";
-                logDiv.innerText = "投喂任务已完成";
-                setTimeout(() => { if(logDiv.className === "success-text") logDiv.innerText = ""; }, 3000);
+                logDiv.innerText = "⏹ 停止指令已发送，设备将立即停止";
+                // 立即结束锁定状态
+                finishTask();
+            } else {
+                throw new Error(data.message || '停止指令发送失败');
+            }
+        })
+        .catch((err) => {
+            logDiv.className = "error-text";
+            logDiv.innerText = `❌ 停止失败：${err.message}`;
+        });
+    }
+
+    // ========== 启动预估计时器 ==========
+    function startLockTimer(count) {
+        const logDiv = document.getElementById('log');
+        // 总预估时间 = 2秒启动冗余 + 每份9秒
+        const totalSeconds = 2 + (count * feedTimePerUnit);
+        remainingSeconds = totalSeconds;
+
+        // 清除旧计时器
+        if (lockTimer) {
+            clearInterval(lockTimer);
+            lockTimer = null;
+        }
+
+        lockTimer = setInterval(() => {
+            if (remainingSeconds > 0) {
+                if (remainingSeconds > (count * feedTimePerUnit)) {
+                    logDiv.innerText = `🚀 准备启动... 剩余 ${remainingSeconds}s`;
+                } else {
+                    logDiv.innerText = `⏳ 投喂中 (${count}份)... 剩余 ${remainingSeconds}s`;
+                }
+                remainingSeconds--;
+            } else {
+                // 计时结束，自动解锁
+                logDiv.innerText = "✅ 投喂任务完成（预估）";
+                finishTask();
             }
         }, 1000);
     }
 
+    // ========== 完成任务，解锁界面 ==========
+    function finishTask() {
+        if (lockTimer) {
+            clearInterval(lockTimer);
+            lockTimer = null;
+        }
+        isRunning = false;
+        setButtonsDisabled(false);
+        
+        const logDiv = document.getElementById('log');
+        logDiv.className = "success-text";
+        logDiv.innerText = "✅ 设备已就绪，可继续投喂";
+        
+        // 3秒后恢复空闲提示
+        setTimeout(() => {
+            if (!isRunning && logDiv.innerText.includes("就绪")) {
+                logDiv.className = "idle-text";
+                logDiv.innerText = "👋 等待指令...";
+            }
+        }, 3000);
+    }
+
+    // ========== 控制按钮启用/禁用 ==========
+    function setButtonsDisabled(disabled) {
+        const allBtns = document.querySelectorAll('.btn');
+        allBtns.forEach(btn => btn.disabled = disabled);
+        // 停止按钮单独处理：运行时可用，空闲时不可用（但保留点击反馈）
+        const stopBtn = document.getElementById('stopBtn');
+        if (stopBtn) {
+            stopBtn.disabled = !disabled; // 只有在运行时才启用停止按钮
+        }
+    }
+
+    // ========== 检测设备在线状态 ==========
     async function checkStatus() {
         try {
             const res = await fetch(`https://apis.bemfa.com/va/online?uid=${uid}&topic=${topic}&type=1`);
@@ -168,9 +307,15 @@ function sendFeed(count) {
                 if (json.data === true) {
                     wrap.className = "dot-indicator online";
                     text.innerText = "在线";
+                    // 如果设备在线但之前被锁且未完成，不自动解锁（保留用户操作）
                 } else {
                     wrap.className = "dot-indicator offline";
                     text.innerText = "离线";
+                    // 设备离线时强制解锁，防止卡死
+                    if (isRunning) {
+                        finishTask();
+                        document.getElementById('log').innerText = "⚠️ 设备离线，已自动解锁";
+                    }
                 }
             }
         } catch (e) {
@@ -178,8 +323,18 @@ function sendFeed(count) {
         }
     }
 
+    // ========== 初始化 ==========
     setInterval(checkStatus, 10000);
     checkStatus();
+    
+    // 页面加载完成时，确保停止按钮初始状态为禁用（空闲时不可用）
+    window.addEventListener('load', function() {
+        document.getElementById('stopBtn').disabled = true;
+    });
+
+    // 暴露函数到全局（方便调试）
+    window.sendStop = sendStop;
+    window.sendFeed = sendFeed;
 </script>
 
 </body>
